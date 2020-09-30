@@ -12,7 +12,7 @@ void printhelp(const char *execname)
 	ranebo(titlebuf, "Ranebo", RANEBO_TRUECOLOR);
 	printf(
 		"%s v%s, the colorful shell util\n"
-		"Usage: %s [(option|string)...] [--] [str...]\n"
+		"Usage: %s [(option|string)...] [--] [string...]\n"
 		"\n"
 		"%s utilizes ANSI escapes to color its arguments rainbow.\n"
 		"\n"
@@ -24,7 +24,12 @@ void printhelp(const char *execname)
 		"  -t    --tc         Use 24-bit color (truecolor/RGB) escapes\n"
 		"        --truecolor\n"
 		"  -s S  --separator S\n"
-		"        --sep S      Set the output separator to S (default is LF)\n",
+		"        --sep S      Set the output separator to S (default is LF)\n"
+		"\n"
+		"All arguments after `--` will not be parsed as options.\n"
+		"You can chain flags into one argument, like this:\n"
+		"    ranebo -ts . www example com\n"
+		"The flag that takes an argument should come last in the chain\n",
 		titlebuf,
 		RANEBO_VERSION,
 		execname,
