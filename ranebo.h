@@ -11,10 +11,10 @@
 #define RANEBO_EXTENDED 2
 #define RANEBO_TRUECOLOR 3
 
-char *ranebo(const char *str, int strlen, int colormode, int *bufsz);
 
-char *ranebo(const char *str, int colormode, int *bufsz) {
-	return ranebo(str, strlen(str), colormode, bufsz);
-}
+int ranebosz(int strlen, int colormode);
+
+void ranebo(char *buf, const char *str, int colormode);
+
 
 #endif

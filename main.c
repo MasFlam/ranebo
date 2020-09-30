@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "ranebo.h'
+#include "ranebo.h"
 
 void printhelp(const char *execname)
 {
@@ -62,6 +62,11 @@ int main(int argc, const char **argv)
 					colormode = RANEBO_TRUECOLOR;
 				else if(strcmp("--", arg) == 0)
 					state = 2;
+				else if(strspn(arg, "-") == 2)
+				{
+					fprintf(stderr, "Invalid option: %s\n", arg);
+					return 1;
+				}
 				else if(arg[0] == '-')
 				{
 					char c;
@@ -71,7 +76,7 @@ int main(int argc, const char **argv)
 						switch(c)
 						{
 							case 'h':
-								printhelp();
+								printhelp(argv[0]);
 								return 0;
 							case 'v':
 								printver();
@@ -98,10 +103,13 @@ int main(int argc, const char **argv)
 				}
 				break;
 			case 2: // strings
-				int bufsz;
-				char *buf = ranebo(arg, colormode, &bufsz);
+			{
+				int bufsz = ranebosz(strlen(arg), colormode);
+				char *buf = calloc(bufsz, sizeof(char));
+				ranebo(buf, arg, colormode);
 				puts(buf);
 				free(buf);
+			}
 			}
 		}
 		return 0;
