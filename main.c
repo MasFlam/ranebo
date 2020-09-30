@@ -25,11 +25,15 @@ void printhelp(const char *execname)
 		"        --truecolor\n"
 		"  -s S  --separator S\n"
 		"        --sep S      Set the output separator to S (default is LF)\n"
+		"  -u    --utf8       Use UTF-8 as the input and output encoding\n"
+		"  -a    --ascii      Use ASCII as the input and output encoding (default)\n"
+		"  -S    --stdin      Read strings also from stdin\n"
 		"\n"
 		"All arguments after `--` will not be parsed as options.\n"
 		"You can chain flags into one argument, like this:\n"
 		"    ranebo -ts . www example com\n"
-		"The flag that takes an argument should come last in the chain\n",
+		"The above would result in `\e[38;2;255;000;000mw\e[38;2;255;127;000mw\e[38;2;255;255;000mw\e[0m.\e[38;2;255;000;000me\e[38;2;255;127;000mx\e[38;2;255;255;000ma\e[38;2;000;188;063mm\e[38;2;000;104;255mp\e[38;2;122;000;229ml\e[38;2;255;000;000me\e[0m.\e[38;2;255;000;000mc\e[38;2;255;127;000mo\e[38;2;255;255;000mm\e[0m.` being printed to stdout.\n"
+		"The flag that takes an argument should come last in the chain.\n",
 		titlebuf,
 		RANEBO_VERSION,
 		execname,
@@ -42,35 +46,46 @@ void printver()
 {
 	int bufsz = ranebosz(strlen("Ranebo"), RANEBO_TRUECOLOR);
 	char *titlebuf = calloc(bufsz, sizeof(char));
+	
 	ranebo(titlebuf, "Ranebo", RANEBO_TRUECOLOR);
 	printf("%s v%s\n", titlebuf, RANEBO_VERSION);
+	
 	free(titlebuf);
 }
 
-void print_rainbo_arg(int i, int argc, const char *const *const argv, const char *separator, int colormode)
+void print_ranebo_arg(const char *arg, const char *separator, int colormode, int use_utf8)
 {
-	const char *arg = argv[i];
-	int bufsz = ranebosz(strlen(arg), colormode);
-	char *buf = calloc(bufsz, sizeof(char));
-	ranebo(buf, arg, colormode);
-	if(i < argc - 1)
-	{	printf("%s%s", buf, separator); }
+	int bufsz;
+	if(use_utf8)
+		bufsz = ranebosz_utf8(arg, colormode);
 	else
-	{	puts(buf); }
+		bufsz = ranebosz(strlen(arg), colormode);
+	char *buf = calloc(bufsz, sizeof(char));
+	
+	if(use_utf8)
+		ranebo_utf8(buf, arg, colormode);
+	else
+		ranebo(buf, arg, colormode);
+	
+	printf("%s%s", buf, separator);
+	
 	free(buf);
 }
 
 
 int main(int argc, const char *const *const argv)
 {
+	int read_stdin = 0;
+	const char *separator = "\n";
+	int colormode = 2;
+	int use_utf8 = 0;
+	
 	if(argc == 1)
-	{	return 0; }
+		return 0;
 	else
 	{
 		int state = 1;
 		int i;
-		int colormode = 2;
-		const char *separator = "\n";
 		for(i = 1; i < argc; ++i)
 		{
 			const char *arg = argv[i];
@@ -89,15 +104,21 @@ int main(int argc, const char *const *const argv)
 					return 0;
 				}
 				else if(strcmp("--basic", arg) == 0)
-				{	colormode = RANEBO_BASIC; }
+					colormode = RANEBO_BASIC;
 				else if(strcmp("--extended", arg) == 0)
-				{	colormode = RANEBO_EXTENDED; }
+					colormode = RANEBO_EXTENDED;
 				else if(strcmp("--truecolor", arg) == 0 || strcmp("--tc", arg) == 0)
-				{	colormode = RANEBO_TRUECOLOR; }
+					colormode = RANEBO_TRUECOLOR;
 				else if(strcmp("--separator", arg) == 0 || strcmp("--sep", arg) == 0)
-				{	state = 10; }
+					state = 10;
+				else if(strcmp("--utf8", arg) == 0)
+					use_utf8 = 1;
+				else if(strcmp("--ascii", arg) == 0)
+					use_utf8 = 0;
+				else if(strcmp("--stdin", arg) == 0)
+					read_stdin = 1;
 				else if(strcmp("--", arg) == 0)
-				{	state = 2; }
+					state = 2;
 				else if(strspn(arg, "-") == 2)
 				{
 					fprintf(stderr, "Invalid option: %s\n", arg);
@@ -129,6 +150,15 @@ int main(int argc, const char *const *const argv)
 							case 's':
 								state = 10;
 								goto skip_flags;
+							case 'u':
+								use_utf8 = 1;
+								break;
+							case 'a':
+								use_utf8 = 0;
+								break;
+							case 'S':
+								read_stdin = 1;
+								break;
 							default:
 								fprintf(stderr, "Invalid flag option: -%c\n", c);
 								return 2;
@@ -138,12 +168,12 @@ skip_flags:;
 				}
 				else
 				{	/* string */
-					print_rainbo_arg(i, argc, argv, separator, colormode);
+					print_ranebo_arg(arg, separator, colormode, use_utf8);
 				}
 			} break;
 			case 2:
 			{	/* only strings */
-				print_rainbo_arg(i, argc, argv, separator, colormode);
+				print_ranebo_arg(arg, separator, colormode, use_utf8);
 			} break;
 			case 10:
 			{	/* separator */
@@ -152,6 +182,39 @@ skip_flags:;
 			} break;
 			}
 		}
-		return 0;
 	}
+	
+	if(read_stdin)
+	{
+		int seplen = strlen(separator);
+		int argbufsz = seplen + 1;
+		char *argbuf = calloc(seplen + 1, sizeof(char));
+		int argbuflen = 0;
+		
+		int ch;
+		while((ch = getchar()) != EOF)
+		{
+			if(argbufsz == argbuflen)
+				argbuf = realloc(argbuf, (argbufsz *= 2) * sizeof(char));
+			
+			argbuf[argbuflen++] = ch;
+			
+			if(argbuflen >= seplen && ch == separator[seplen - 1])
+			{
+				argbuf[argbuflen] = '\0'; /* since this might not be the case after a realloc */
+				if(strcmp(argbuf + argbuflen - seplen, separator) == 0)
+				{
+					argbuf[argbuflen - seplen] = '\0';
+					
+					print_ranebo_arg(argbuf, separator, colormode, use_utf8);
+					
+					argbuflen = 0;
+				}
+			}
+		}
+		
+		free(argbuf);
+	}
+	
+	return 0;
 }
