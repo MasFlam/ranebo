@@ -1,16 +1,18 @@
 CC := gcc
-CCFLAGS := -ansi
+CCFLAGS := -ansi -Wall
 
 .PHONY: all clean compile
 
 all: clean compile
 clean:
-	rm *.o ranebo
-compile: main.c
+	rm -f *.o ranebo
+compile: ranebo
 
+ranebo: main.o ranebo.o
+	$(CC) $(CCFLAGS) *.o -o ranebo
 
-main.c: ranebo.c
-	$(CC) $(CCFLAGS) main.c *.o -o ranebo
+main.o: main.c ranebo.h
+	$(CC) $(CCFLAGS) -c main.c -o main.o
 
-ranebo.c: ranebo.h
+ranebo.o: ranebo.c ranebo.h
 	$(CC) $(CCFLAGS) -c ranebo.c -o ranebo.o

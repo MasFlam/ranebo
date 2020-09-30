@@ -34,14 +34,14 @@ int ranebosz(int slen, int colormode)
 	switch(colormode)
 	{
 	case RANEBO_BASIC:
-		return slen * 5 + 4 + 1;
+		return slen * (5+1) + 4 + 1;
 		break;
 	default:
 	case RANEBO_EXTENDED:
-		return slen * 11 + 4 + 1;
+		return slen * (11+1) + 4 + 1;
 		break;
 	case RANEBO_TRUECOLOR:
-		return slen * 20 + 4 + 1;
+		return slen * (19+1) + 4 + 1;
 	}
 }
 
@@ -64,7 +64,7 @@ void ranebo(char *buf, const char *str, int colormode)
 			break;
 		case RANEBO_TRUECOLOR:
 			strcpy(buf + j, truecolors[i % 6]);
-			j += 20;
+			j += 19;
 		}
 		buf[j++] = c;
 		++i;
