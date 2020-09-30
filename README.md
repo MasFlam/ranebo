@@ -1,4 +1,4 @@
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/MasFlam/ranebo?logo=github&sort=semver)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/MasFlam/ranebo?color=blue&logo=github&sort=semver)
 
 # Ranebo
 The colorful shell util  
