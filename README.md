@@ -1,8 +1,8 @@
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/MasFlam/ranebo?color=blue&logo=github&sort=semver)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/MasFlam/ranebo?color=blue&logo=github&sort=semver)](https://github.com/MasFlam/ranebo/releases/latest)
+[![GitHub](https://img.shields.io/github/license/MasFlam/ranebo?label=License)](https://github.com/MasFlam/ranebo/blob/master/LICENSE)
 
-# Ranebo
-The colorful shell util  
-Ranebo utilizes ANSI escapes to color its arguments rainbow.
+# Ranebo - The colorful shell util
+Ranebo utilizes ANSI terminal escapes to color its arguments rainbow.
 
 # Usage
 `ranebo [(option|string)...] [--] [string...]`
@@ -29,3 +29,4 @@ given you have GCC installed.
 
 The Makefile is very simple - I think one can easily
 figure out how to adjust the compilation process.
+
