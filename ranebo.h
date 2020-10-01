@@ -4,7 +4,7 @@
 
 #include <string.h>
 
-#define RANEBO_VERSION "0.2.0"
+#define RANEBO_VERSION "0.2.1"
 
 #define RANEBO_BASIC 1
 #define RANEBO_EXTENDED 2

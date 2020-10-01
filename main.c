@@ -7,9 +7,9 @@
 
 void printhelp(const char *execname)
 {
-	int bufsz = ranebosz(strlen("Ranebo"), RANEBO_TRUECOLOR);
+	int bufsz = ranebosz(strlen("Ranebo"), RANEBO_EXTENDED);
 	char *titlebuf = calloc(bufsz, sizeof(char));
-	ranebo(titlebuf, "Ranebo", RANEBO_TRUECOLOR);
+	ranebo(titlebuf, "Ranebo", RANEBO_EXTENDED);
 	printf(
 		"%s v%s, the colorful shell util\n"
 		"Usage: %s [(option|string)...] [--] [string...]\n"
@@ -31,8 +31,8 @@ void printhelp(const char *execname)
 		"\n"
 		"All arguments after `--` will not be parsed as options.\n"
 		"You can chain flags into one argument, like this:\n"
-		"    ranebo -ts . www example com\n"
-		"The above would result in `\e[38;2;255;000;000mw\e[38;2;255;127;000mw\e[38;2;255;255;000mw\e[0m.\e[38;2;255;000;000me\e[38;2;255;127;000mx\e[38;2;255;255;000ma\e[38;2;000;188;063mm\e[38;2;000;104;255mp\e[38;2;122;000;229ml\e[38;2;255;000;000me\e[0m.\e[38;2;255;000;000mc\e[38;2;255;127;000mo\e[38;2;255;255;000mm\e[0m.` being printed to stdout.\n"
+		"    ranebo -3s . www example com\n"
+		"The above would result in `\e[31mw\e[33mw\e[32mw\e[0m.\e[31me\e[33mx\e[32ma\e[36mm\e[34mp\e[35ml\e[31me\e[0m.\e[31mc\e[33mo\e[32mm\e[0m.` being printed to stdout.\n"
 		"The flag that takes an argument should come last in the chain.\n",
 		titlebuf,
 		RANEBO_VERSION,
@@ -44,10 +44,10 @@ void printhelp(const char *execname)
 
 void printver()
 {
-	int bufsz = ranebosz(strlen("Ranebo"), RANEBO_TRUECOLOR);
+	int bufsz = ranebosz(strlen("Ranebo"), RANEBO_EXTENDED);
 	char *titlebuf = calloc(bufsz, sizeof(char));
 	
-	ranebo(titlebuf, "Ranebo", RANEBO_TRUECOLOR);
+	ranebo(titlebuf, "Ranebo", RANEBO_EXTENDED);
 	printf("%s v%s\n", titlebuf, RANEBO_VERSION);
 	
 	free(titlebuf);
@@ -211,6 +211,13 @@ skip_flags:;
 					argbuflen = 0;
 				}
 			}
+		}
+		
+		if(argbuflen > 0)
+		{
+			argbuf[argbuflen - seplen] = '\0';
+			print_ranebo_arg(argbuf, separator, colormode, use_utf8);
+			argbuflen = 0;
 		}
 		
 		free(argbuf);
