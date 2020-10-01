@@ -1,5 +1,6 @@
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/MasFlam/ranebo?color=blue&logo=github&sort=semver)](https://github.com/MasFlam/ranebo/releases/latest)
 [![GitHub](https://img.shields.io/github/license/MasFlam/ranebo?label=License)](https://github.com/MasFlam/ranebo/blob/master/LICENSE)
+[![GitHub top language](https://img.shields.io/github/languages/top/MasFlam/ranebo?label=ANSI%20C)](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
 
 # Ranebo - The colorful shell util
 Ranebo utilizes ANSI terminal escapes to color its arguments rainbow.
