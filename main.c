@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "ranebo.h"
+#include "utf8utils.h"
 
 
 void printhelp(const char *execname)
@@ -53,8 +54,16 @@ void printver()
 	free(titlebuf);
 }
 
-void print_ranebo_arg(const char *arg, const char *separator, int colormode, int use_utf8)
+/* Return 0 if successful, 1 otherwise. */
+int print_ranebo_arg(const char *arg, const char *separator, int colormode, int use_utf8)
 {
+	if(use_utf8)
+		if(!is_valid_utf8(arg))
+		{
+			fputs("Invalid UTF-8\n", stderr);
+			return 1;
+		}
+	
 	int bufsz;
 	if(use_utf8)
 		bufsz = ranebosz_utf8(arg, colormode);
@@ -70,11 +79,17 @@ void print_ranebo_arg(const char *arg, const char *separator, int colormode, int
 	printf("%s%s", buf, separator);
 	
 	free(buf);
+	
+	return 0;
 }
 
 
 int main(int argc, const char *const *const argv)
 {
+	/*int iz = is_valid_utf8("Za\xC5\xBC\xC3\xB3\xC5\x82\xC4\x87 G\xC4\x99\xC5\x9Bl\xC4\x85 Ja\xC5\xBA\xC5\x84.\n");
+	printf("%d\n", iz);
+	return 0;*/
+	
 	int read_stdin = 0;
 	const char *separator = "\n";
 	int colormode = 2;
@@ -168,12 +183,16 @@ skip_flags:;
 				}
 				else
 				{	/* string */
-					print_ranebo_arg(arg, separator, colormode, use_utf8);
+					int o = print_ranebo_arg(arg, separator, colormode, use_utf8);
+					if(o)
+						return o;
 				}
 			} break;
 			case 2:
 			{	/* only strings */
-				print_ranebo_arg(arg, separator, colormode, use_utf8);
+				int o = print_ranebo_arg(arg, separator, colormode, use_utf8);
+				if(o)
+					return o;
 			} break;
 			case 10:
 			{	/* separator */
@@ -206,7 +225,12 @@ skip_flags:;
 				{
 					argbuf[argbuflen - seplen] = '\0';
 					
-					print_ranebo_arg(argbuf, separator, colormode, use_utf8);
+					int o = print_ranebo_arg(argbuf, separator, colormode, use_utf8);
+					if(o)
+					{
+						free(argbuf);
+						return o;
+					}
 					
 					argbuflen = 0;
 				}
@@ -216,7 +240,12 @@ skip_flags:;
 		if(argbuflen > 0)
 		{
 			argbuf[argbuflen - seplen] = '\0';
-			print_ranebo_arg(argbuf, separator, colormode, use_utf8);
+			int o = print_ranebo_arg(argbuf, separator, colormode, use_utf8);
+			if(o)
+			{
+				free(argbuf);
+				return o;
+			}
 			argbuflen = 0;
 		}
 		

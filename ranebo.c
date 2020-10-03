@@ -1,6 +1,7 @@
 #include "ranebo.h"
 
 #include <stdlib.h>
+#include "utf8utils.h"
 
 const char *basic_colors[6] = {
 	"\e[31m",
@@ -28,47 +29,6 @@ const char *truecolors[6] = {
 	"\e[38;2;000;104;255m",
 	"\e[38;2;122;000;229m"
 };
-
-/* UTF-8 helper function returning the length of the codepoint starting
- * with start, or 0 if no valid codepoint can start with start.
-*/
-int codepoint_len(char start)
-{
-	/* 11110xxx */
-	if((start & 0xF8) == 0xF0)
-		return 4;
-	
-	/* 1110xxxx */
-	if((start & 0xF0) == 0xE0)
-		return 3;
-	
-	/* 110xxxxx */
-	if((start & 0xE0) == 0xC0)
-		return 2;
-	
-	/* 0xxxxxxx */
-	if((start & 0x80) == 0)
-		return 1;
-	
-	return 0;
-}
-
-int strlen_utf8(const char *str)
-{
-	int cnt = 0;
-	const char *sptr = str;
-	char c;
-	while((c = *sptr) != '\0')
-	{
-		int cplen = codepoint_len(c);
-		/* TODO: add check for cplen == 0 */
-		
-		sptr += cplen;
-		++cnt;
-	}
-	
-	return cnt;
-}
 
 int ranebosz(int slen, int colormode)
 {
@@ -130,7 +90,6 @@ void ranebo_utf8(char *buf, const char *str, int colormode)
 	while((c = *sptr) != '\0')
 	{
 		int cplen = codepoint_len(c);
-		/* TODO: add check for cplen == 0 */
 		
 		switch(colormode)
 		{
