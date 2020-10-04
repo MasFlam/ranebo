@@ -22,7 +22,7 @@ const char *const options_str1 =
 const char*const options_str2 =
 	"  -S    --stdin      Read strings also from stdin\n";
 
-const char *const wwwexamplecom_str = "`\xB1[31mw\xB1[33mw\xB1[32mw\xB1[0m.\xB1[31me\xB1[33mx\xB1[32ma\xB1[36mm\xB1[34mp\xB1[35ml\xB1[31me\xB1[0m.\xB1[31mc\xB1[33mo\xB1[32mm\xB1[0m.`";
+const char *const wwwexamplecom_str = "`\x1B[31mw\x1B[33mw\x1B[32mw\x1B[0m.\x1B[31me\x1B[33mx\x1B[32ma\x1B[36mm\x1B[34mp\x1B[35ml\x1B[31me\x1B[0m.\x1B[31mc\x1B[33mo\x1B[32mm\x1B[0m.`";
 
 void printhelp(const char *execname)
 {

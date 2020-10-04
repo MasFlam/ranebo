@@ -4,30 +4,30 @@
 #include "utf8utils.h"
 
 const char *basic_colors[6] = {
-	"\xB1[31m",
-	"\xB1[33m",
-	"\xB1[32m",
-	"\xB1[36m",
-	"\xB1[34m",
-	"\xB1[35m"
+	"\x1B[31m",
+	"\x1B[33m",
+	"\x1B[32m",
+	"\x1B[36m",
+	"\x1B[34m",
+	"\x1B[35m"
 };
 
 const char *extended_colors[6] = {
-	"\xB1[38;5;124m",
-	"\xB1[38;5;130m",
-	"\xB1[38;5;220m",
-	"\xB1[38;5;028m",
-	"\xB1[38;5;019m",
-	"\xB1[38;5;055m"
+	"\x1B[38;5;124m",
+	"\x1B[38;5;130m",
+	"\x1B[38;5;220m",
+	"\x1B[38;5;028m",
+	"\x1B[38;5;019m",
+	"\x1B[38;5;055m"
 };
 
 const char *truecolors[6] = {
-	"\xB1[38;2;255;000;000m",
-	"\xB1[38;2;255;127;000m",
-	"\xB1[38;2;255;255;000m",
-	"\xB1[38;2;000;188;063m",
-	"\xB1[38;2;000;104;255m",
-	"\xB1[38;2;122;000;229m"
+	"\x1B[38;2;255;000;000m",
+	"\x1B[38;2;255;127;000m",
+	"\x1B[38;2;255;255;000m",
+	"\x1B[38;2;000;188;063m",
+	"\x1B[38;2;000;104;255m",
+	"\x1B[38;2;122;000;229m"
 };
 
 int ranebosz(int slen, int colormode)
@@ -78,7 +78,7 @@ void ranebo(char *buf, const char *str, int colormode)
 		++i;
 	}
 	
-	strcpy(buf + j, "\xB1[0m");
+	strcpy(buf + j, "\x1B[0m");
 }
 
 void ranebo_utf8(char *buf, const char *str, int colormode)
@@ -113,5 +113,5 @@ void ranebo_utf8(char *buf, const char *str, int colormode)
 		++i;
 	}
 	
-	strcpy(bufptr, "\xB1[0m");
+	strcpy(bufptr, "\x1B[0m");
 }
