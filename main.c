@@ -6,6 +6,24 @@
 #include "utf8utils.h"
 
 
+const char *const options_str1 =
+	"The available options are:\n"
+	"  -h    --help       Show this help message\n"
+	"  -v    --version    Show Ranebo version\n"
+	"  -3    --basic      Use 3-bit color escapes\n"
+	"  -8    --extended   Use 8-bit color escapes (default)\n"
+	"  -t    --tc         Use 24-bit color (truecolor/RGB) escapes\n"
+	"        --truecolor\n"
+	"  -s S  --separator S\n"
+	"        --sep S      Set the output separator to S (default LF)\n"
+	"  -u    --utf8       Use UTF-8 as the input and output encoding\n"
+	"  -a    --ascii      Use ASCII as the input and output encoding\n";
+
+const char*const options_str2 =
+	"  -S    --stdin      Read strings also from stdin\n";
+
+const char *const wwwexamplecom_str = "`\xB1[31mw\xB1[33mw\xB1[32mw\xB1[0m.\xB1[31me\xB1[33mx\xB1[32ma\xB1[36mm\xB1[34mp\xB1[35ml\xB1[31me\xB1[0m.\xB1[31mc\xB1[33mo\xB1[32mm\xB1[0m.`";
+
 void printhelp(const char *execname)
 {
 	int bufsz = ranebosz(strlen("Ranebo"), RANEBO_EXTENDED);
@@ -18,27 +36,19 @@ void printhelp(const char *execname)
 		"%s utilizes ANSI escapes to color its arguments rainbow.\n"
 		"\n"
 		"The available options are:\n"
-		"  -h    --help       Show this help message\n"
-		"  -v    --version    Show Ranebo version\n"
-		"  -3    --basic      Use 3-bit color escapes\n"
-		"  -8    --extended   Use 8-bit color escapes (default)\n"
-		"  -t    --tc         Use 24-bit color (truecolor/RGB) escapes\n"
-		"        --truecolor\n"
-		"  -s S  --separator S\n"
-		"        --sep S      Set the output separator to S (default is LF)\n"
-		"  -u    --utf8       Use UTF-8 as the input and output encoding\n"
-		"  -a    --ascii      Use ASCII as the input and output encoding (default)\n"
-		"  -S    --stdin      Read strings also from stdin\n"
+		"%s%s"
 		"\n"
 		"All arguments after `--` will not be parsed as options.\n"
 		"You can chain flags into one argument, like this:\n"
 		"    ranebo -3s . www example com\n"
-		"The above would result in `\e[31mw\e[33mw\e[32mw\e[0m.\e[31me\e[33mx\e[32ma\e[36mm\e[34mp\e[35ml\e[31me\e[0m.\e[31mc\e[33mo\e[32mm\e[0m.` being printed to stdout.\n"
+		"The above would result in %s being printed to stdout.\n"
 		"The flag that takes an argument should come last in the chain.\n",
 		titlebuf,
 		RANEBO_VERSION,
 		execname,
-		titlebuf
+		titlebuf,
+		options_str1, options_str2,
+		wwwexamplecom_str
 	);
 	free(titlebuf);
 }
@@ -57,6 +67,8 @@ void printver()
 /* Return 0 if successful, 1 otherwise. */
 int print_ranebo_arg(const char *arg, const char *separator, int colormode, int use_utf8)
 {
+	int bufsz;
+	char *buf;
 	if(use_utf8)
 		if(!is_valid_utf8(arg))
 		{
@@ -64,12 +76,11 @@ int print_ranebo_arg(const char *arg, const char *separator, int colormode, int 
 			return 1;
 		}
 	
-	int bufsz;
 	if(use_utf8)
 		bufsz = ranebosz_utf8(arg, colormode);
 	else
 		bufsz = ranebosz(strlen(arg), colormode);
-	char *buf = calloc(bufsz, sizeof(char));
+	buf = calloc(bufsz, sizeof(char));
 	
 	if(use_utf8)
 		ranebo_utf8(buf, arg, colormode);
@@ -86,10 +97,6 @@ int print_ranebo_arg(const char *arg, const char *separator, int colormode, int 
 
 int main(int argc, const char *const *const argv)
 {
-	/*int iz = is_valid_utf8("Za\xC5\xBC\xC3\xB3\xC5\x82\xC4\x87 G\xC4\x99\xC5\x9Bl\xC4\x85 Ja\xC5\xBA\xC5\x84.\n");
-	printf("%d\n", iz);
-	return 0;*/
-	
 	int read_stdin = 0;
 	const char *separator = "\n";
 	int colormode = 2;
@@ -223,9 +230,11 @@ skip_flags:;
 				argbuf[argbuflen] = '\0'; /* since this might not be the case after a realloc */
 				if(strcmp(argbuf + argbuflen - seplen, separator) == 0)
 				{
+					int o;
+					
 					argbuf[argbuflen - seplen] = '\0';
 					
-					int o = print_ranebo_arg(argbuf, separator, colormode, use_utf8);
+					o = print_ranebo_arg(argbuf, separator, colormode, use_utf8);
 					if(o)
 					{
 						free(argbuf);
@@ -239,8 +248,9 @@ skip_flags:;
 		
 		if(argbuflen > 0)
 		{
+			int o;
 			argbuf[argbuflen - seplen] = '\0';
-			int o = print_ranebo_arg(argbuf, separator, colormode, use_utf8);
+			o = print_ranebo_arg(argbuf, separator, colormode, use_utf8);
 			if(o)
 			{
 				free(argbuf);

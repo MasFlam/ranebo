@@ -1,5 +1,5 @@
 CC := gcc
-CCFLAGS := -ansi -Wall
+CCFLAGS := -ansi -Wall -Wpedantic
 
 .PHONY: all clean compile
 
