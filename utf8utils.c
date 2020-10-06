@@ -71,10 +71,7 @@ int is_valid_codepoint(const char *sptr, int cplen)
 	} break;
 	}
 	
-	if(0xD800L <= codepoint && codepoint <= 0xDFFFL)
-		return 1;
-	else
-		return 0;
+	return 0xD800L <= codepoint && codepoint <= 0xDFFFL;
 }
 
 int is_valid_utf8(const char *str)
