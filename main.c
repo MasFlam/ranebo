@@ -8,19 +8,21 @@
 
 const char *const options_str1 =
 	"The available options are:\n"
-	"  -h    --help       Show this help message\n"
-	"  -v    --version    Show Ranebo version\n"
-	"  -3    --basic      Use 3-bit color escapes\n"
-	"  -8    --extended   Use 8-bit color escapes (default)\n"
-	"  -t    --tc         Use 24-bit color (truecolor/RGB) escapes\n"
+	"  -h    --help         Show this help message\n"
+	"  -v    --version      Show Ranebo version\n"
+	"  -3    --basic        Use 3-bit color escapes\n"
+	"  -8    --extended     Use 8-bit color escapes (default)\n"
+	"  -t    --tc           Use 24-bit color (truecolor/RGB) escapes\n"
 	"        --truecolor\n"
-	"  -s S  --separator S\n"
-	"        --sep S      Set the output separator to S (default LF)\n"
-	"  -u    --utf8       Use UTF-8 as the input and output encoding\n"
-	"  -a    --ascii      Use ASCII as the input and output encoding\n";
+	"  -s S  --separator S  Set the output separator to S (default LF)\n"
+	"        --sep S\n"
+	"  -u    --utf8         Use UTF-8 as the input and output encoding\n";
 
 const char*const options_str2 =
-	"  -S    --stdin      Read strings also from stdin\n";
+	"  -a    --ascii        Use ASCII as the input and output encoding\n"
+	"  -S    --stdin        Read strings also from stdin\n"
+	"        --validate     Validate UTF-8 input (default)\n"
+	"        --no-validate  Don't validate UTF-8 input\n";
 
 const char *const wwwexamplecom_str = "`\x1B[31mw\x1B[33mw\x1B[32mw\x1B[0m.\x1B[31me\x1B[33mx\x1B[32ma\x1B[36mm\x1B[34mp\x1B[35ml\x1B[31me\x1B[0m.\x1B[31mc\x1B[33mo\x1B[32mm\x1B[0m.`";
 
@@ -65,11 +67,11 @@ void printver()
 }
 
 /* Return 0 if successful, 1 otherwise. */
-int print_ranebo_arg(const char *arg, const char *separator, int colormode, int use_utf8)
+int print_ranebo_arg(const char *arg, const char *separator, int colormode, int use_utf8, int should_validate)
 {
 	int bufsz;
 	char *buf;
-	if(use_utf8)
+	if(use_utf8 && should_validate)
 		if(!is_valid_utf8(arg))
 		{
 			fputs("Invalid UTF-8\n", stderr);
@@ -100,7 +102,7 @@ int main(int argc, const char *const *const argv)
 	int read_stdin = 0;
 	const char *separator = "\n";
 	int colormode = 2;
-	int use_utf8 = 0;
+	int use_utf8 = 0, should_validate = 1;
 	
 	if(argc == 1)
 		return 0;
@@ -139,6 +141,10 @@ int main(int argc, const char *const *const argv)
 					use_utf8 = 0;
 				else if(strcmp("--stdin", arg) == 0)
 					read_stdin = 1;
+				else if(strcmp("--validate", arg) == 0)
+					should_validate = 1;
+				else if(strcmp("--no-validate", arg) == 0)
+					should_validate = 0;
 				else if(strcmp("--", arg) == 0)
 					state = 2;
 				else if(strspn(arg, "-") == 2)
@@ -190,14 +196,14 @@ skip_flags:;
 				}
 				else
 				{	/* string */
-					int o = print_ranebo_arg(arg, separator, colormode, use_utf8);
+					int o = print_ranebo_arg(arg, separator, colormode, use_utf8, should_validate);
 					if(o)
 						return o;
 				}
 			} break;
 			case 2:
 			{	/* only strings */
-				int o = print_ranebo_arg(arg, separator, colormode, use_utf8);
+				int o = print_ranebo_arg(arg, separator, colormode, use_utf8, should_validate);
 				if(o)
 					return o;
 			} break;
@@ -234,7 +240,7 @@ skip_flags:;
 					
 					argbuf[argbuflen - seplen] = '\0';
 					
-					o = print_ranebo_arg(argbuf, separator, colormode, use_utf8);
+					o = print_ranebo_arg(argbuf, separator, colormode, use_utf8, should_validate);
 					if(o)
 					{
 						free(argbuf);
@@ -250,7 +256,7 @@ skip_flags:;
 		{
 			int o;
 			argbuf[argbuflen - seplen] = '\0';
-			o = print_ranebo_arg(argbuf, separator, colormode, use_utf8);
+			o = print_ranebo_arg(argbuf, separator, colormode, use_utf8, should_validate);
 			if(o)
 			{
 				free(argbuf);
